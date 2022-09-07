@@ -43,7 +43,7 @@ public class TuitionOrderController {
         String url = appConfig.getBookmarkMgr().get("url");
         String port = appConfig.getBookmarkMgr().get("port");
 
-        String endpoint = url; //+":"+port + "/";
+        String endpoint = url + "/"; //+":"+port + "/";
         System.out.println("endpoint" + endpoint);
 
         RestTemplate restTemplate = new RestTemplate();

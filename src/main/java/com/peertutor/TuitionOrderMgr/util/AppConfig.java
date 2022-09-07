@@ -8,7 +8,6 @@ import java.util.Map;
 @Configuration
 @ConfigurationProperties(prefix="app-config")
 public class AppConfig {
-
     private Map<String, String> bookmarkMgr;
     private Map<String, String> studentMgr;
     private Map<String, String> tutorMgr;
@@ -17,6 +16,7 @@ public class AppConfig {
     private Map<String, String> recommendationMgr;
     private Map<String, String> tuitionOrderMgr;
     private Map<String, String> accountMgr;
+    private Map<String, String> tutorCalendarMgr;
 
     public Map<String, String> getBookmarkMgr() {
         return bookmarkMgr;
@@ -82,6 +82,14 @@ public class AppConfig {
         this.accountMgr = accountMgr;
     }
 
+    public Map<String, String> getTutorCalendarMgr() {
+        return tutorCalendarMgr;
+    }
+
+    public void setTutorCalendarMgr(Map<String, String> tutorCalendarMgr) {
+        this.tutorCalendarMgr = tutorCalendarMgr;
+    }
+
     @Override
     public String toString() {
         return "AppConfig{" +
@@ -93,6 +101,9 @@ public class AppConfig {
                 ", recommendationMgr=" + recommendationMgr +
                 ", tuitionOrderMgr=" + tuitionOrderMgr +
                 ", accountMgr=" + accountMgr +
+                ", tutorCalendarMgr=" + tutorCalendarMgr +
                 '}';
     }
+
+
 }
