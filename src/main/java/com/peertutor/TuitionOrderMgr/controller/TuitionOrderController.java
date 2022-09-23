@@ -1,86 +1,76 @@
 package com.peertutor.TuitionOrderMgr.controller;
 
-import com.peertutor.TuitionOrderMgr.model.TuitionOrder;
+import com.peertutor.TuitionOrderMgr.model.viewmodel.request.TuitionOrderReq;
+import com.peertutor.TuitionOrderMgr.model.viewmodel.response.TuitionOrderRes;
 import com.peertutor.TuitionOrderMgr.repository.TuitionOrderRepository;
+import com.peertutor.TuitionOrderMgr.service.AuthService;
+import com.peertutor.TuitionOrderMgr.service.TuitionOrderService;
+import com.peertutor.TuitionOrderMgr.service.dto.TuitionOrderCriteria;
+import com.peertutor.TuitionOrderMgr.service.dto.TuitionOrderDTO;
 import com.peertutor.TuitionOrderMgr.util.AppConfig;
+import io.github.jhipster.web.util.PaginationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.SpringVersion;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.Map;
+import javax.validation.Valid;
+import java.util.List;
 
 @Controller
-@RequestMapping(path="/tuition-order-mgr")
+@RequestMapping(path = "/tuition-order-mgr")
 public class TuitionOrderController {
     @Autowired
     AppConfig appConfig;
     @Autowired
-    private TuitionOrderRepository tuitionOrderRepository;// = new CustomerRepository();
-    @GetMapping(path="/")
-    public @ResponseBody String defaultResponse(){
+    private TuitionOrderRepository tuitionOrderRepository;
+    @Autowired
+    private TuitionOrderService tuitionOrderService;
+    @Autowired
+    private AuthService authService;
 
-        System.out.println("appConfig="+ appConfig.toString());
-        System.out.println("ver"+ SpringVersion.getVersion());
-        return "Hello world Spring Ver = " + SpringVersion.getVersion() + "From TuitionOrder mgr";
-
-    }
-    @GetMapping(path="/public-api")
-    public @ResponseBody String callPublicApi() {
-        String endpoint = "https://api.publicapis.org/entries"; //url+":"+port;
-        System.out.println("endpoint" + endpoint);
-
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.getForEntity(endpoint, String.class);
-
-        return response.toString();
-    }
-
-    @GetMapping(path="/call-app-bookmark-mgr")
-    public @ResponseBody String callAppTwo() {
-        String url = appConfig.getBookmarkMgr().get("url");
-        String port = appConfig.getBookmarkMgr().get("port");
-
-        String endpoint = url + "/"; //+":"+port + "/";
-        System.out.println("endpoint" + endpoint);
-
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.getForEntity(endpoint, String.class);
-
-        return response.toString();
-    }
-    @GetMapping(path="/health")
-    public @ResponseBody String healthCheck(){
+    @GetMapping(path = "/health")
+    public @ResponseBody String healthCheck() {
         return "Ok";
     }
 
-    @PostMapping(path = "/add")
-    public @ResponseBody String addNewCustomer(@RequestBody Map<String, String> customerDTO) {
+    @PostMapping(path = "/tuitionOrder")
+    public @ResponseBody ResponseEntity<TuitionOrderRes> createTuitionProfile(@RequestBody @Valid TuitionOrderReq req) {
+        boolean result = authService.getAuthentication(req.name, req.sessionToken);
+        if (!result) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
 
-        // <validation logic here>
-        // todo: generalise validation logic
+        TuitionOrderDTO savedTutionOrder;
 
-        // <retrieve data from request body>
-        System.out.println("customerMap= " +customerDTO);
-        String firstName = customerDTO.get("firstName");
-        String lastName = customerDTO.get("lastName");
-        // create DTO
-        TuitionOrder customer = new TuitionOrder(firstName, lastName);
+        savedTutionOrder = tuitionOrderService.createTuitionOrder(req);
 
-        // dao layer: save object to db
-        tuitionOrderRepository.save(customer);
+        if (savedTutionOrder == null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        }
 
-        // todo: better logging
-        // todo: generalise response message
-        return "Saved";
-    }
-    @GetMapping(path="/all")
-    public @ResponseBody Iterable<TuitionOrder> getAllCustomers (){
+        TuitionOrderRes res = new TuitionOrderRes(savedTutionOrder);
 
-        return tuitionOrderRepository.findAll();
+        return ResponseEntity.ok().body(res);
     }
 
+    @GetMapping("/tuitionOrder")
+    public ResponseEntity<List<TuitionOrderDTO>> getTuitionOrderByCriteria(@RequestBody @Valid TuitionOrderReq req, Pageable pageable) {
+        boolean result = authService.getAuthentication(req.name, req.sessionToken);
+        if (!result) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        TuitionOrderCriteria criteria = new TuitionOrderCriteria(req);
+        Page<TuitionOrderDTO> page = tuitionOrderService.getTuitionOrderByCriteria(criteria, pageable);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        List<TuitionOrderDTO> test = page.getContent();
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
 
 }

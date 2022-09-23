@@ -2,11 +2,13 @@ package com.peertutor.TuitionOrderMgr.util;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 import java.util.Map;
 
 @Configuration
-@ConfigurationProperties(prefix="app-config")
+@ConfigurationProperties(prefix = "app-config")
+@EnableAspectJAutoProxy
 public class AppConfig {
     private Map<String, String> bookmarkMgr;
     private Map<String, String> studentMgr;

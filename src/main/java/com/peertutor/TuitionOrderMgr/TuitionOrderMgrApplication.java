@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class TuitionOrderMgrApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(TuitionOrderMgrApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(TuitionOrderMgrApplication.class, args);
+    }
 
 }

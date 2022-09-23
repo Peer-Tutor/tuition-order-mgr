@@ -1,33 +1,31 @@
-package com.peertutor.TuitionOrderMgr.model;
+package com.peertutor.TuitionOrderMgr.service.dto;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
+import com.peertutor.TuitionOrderMgr.model.TuitionOrder;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Objects;
 
-@Entity
-@Table(name = "tuition_order")
-@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-public class TuitionOrder {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class TuitionOrderDTO implements Serializable {
+
     private Long id;
 
-    @Column(name = "student_id", nullable = false)
     private Long studentId;
 
-    @Column(name = "tutor_id", nullable = false)
     private Long tutorId;
 
-    @Column(name = "start_time")
     private Timestamp startTime;
 
-    @Column(name = "end_time")
     private Timestamp endTime;
 
-    @Column(name = "status")
     private int status;
 
     public Long getId() {
@@ -67,7 +65,7 @@ public class TuitionOrder {
     }
 
     public void setEndTime(Timestamp endTime) {
-        this.endTime = endTime;
+        this.startTime = endTime;
     }
 
     public int getStatus() {
@@ -99,5 +97,10 @@ public class TuitionOrder {
         return "TuitionOrder{" +
                 "id=" + id +
                 '}';
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getId());
     }
 }
