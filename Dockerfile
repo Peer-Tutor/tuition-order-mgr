@@ -32,7 +32,7 @@ RUN echo DB_PORT = $DB_PORT
 RUN ./mvnw install -Dspring.profiles.active=aws  \
     -Dspring.datasource.url=jdbc:mysql://peertutor.cp1u4sm6wyju.ap-southeast-1.rds.amazonaws.com:3306/peerTutor  \
     -Dspring.datasource.password=my-secret-pw -Dspring.datasource.username=admin  \
-    -server.port=8086\
+    -Dserver.port=8086\
     -e
 #    -Dapp-config.jwtExpirationMs=${JWT_EXPIRY_DURATION} \
 
