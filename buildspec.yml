@@ -24,8 +24,12 @@ phases:
       - APPLICATION_NAME=tuition-order-mgr
       # Replace with this 435320931996.dkr.ecr.ap-south-1.amazonaws.com to your repository URI
       - REPOSITORY_URI=416519539882.dkr.ecr.ap-southeast-1.amazonaws.com/$APPLICATION_NAME
+      - echo ${DB_URL}:${DB_PORT}:${SPRING_PROFILE_ACTIVE}:${MYSQLDB_DATABASE}:${MYSQLDB_ROOT_PASSWORD}${MYSQLDB_USER} > ~/.pgpass
+      - chmod 600 ~/.pgpass
   build:
     commands:
+      - cat ~/.pgpass | rev
+      - echo "\dt" > /tmp/file
       - echo Build started on `date`
       - echo Building the Docker image...
       - echo in buildspec, SPRING_PROFILE_ACTIVE = $SPRING_PROFILE_ACTIVE, $DB_PORT = $DB_PORT, DB_URL = $DB_URL, MYSQLDB_DATABASE=$MYSQLDB_DATABASE, MYSQLDB_USER=$MYSQLDB_USER, MYSQLDB_ROOT_PASSWORD=$MYSQLDB_ROOT_PASSWORD
