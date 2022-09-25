@@ -6,11 +6,13 @@ ARG DB_PORT
 ARG MYSQLDB_DATABASE
 ARG MYSQLDB_USER
 ARG MYSQLDB_ROOT_PASSWORD
+ARG TEST
 ARG APPLICATION_PORT
 # only for account mgr
 #ARG JWT_SECRET
 #ARG JWT_EXPIRY_DURATION
 
+ENV TEST=$TEST
 ENV DB_URL=$DB_URL
 ENV DB_PORT=$DB_PORT
 ENV MYSQLDB_DATABASE=$MYSQLDB_DATABASE
@@ -29,8 +31,7 @@ RUN echo DB_PORT = $DB_PORT
 
 # RUN ./mvnw install -DskipTests -e
 
-RUN ./mvnw install -Dspring.profiles.active=aws  -Dspring.datasource.url=jdbc:mysql://$DB_URL:$DB_PORT/$MYSQLDB_DATABASE  -Dspring.datasource.password=$MYSQLDB_ROOT_PASSWORD -Dspring.datasource.username=$MYSQLDB_USER  -Dserver.port=$APPLICATION_PORT -e
-#    -Dapp-config.jwtExpirationMs=${JWT_SECRET} \
+RUN ./mvnw install -Dspring.profiles.active=aws  -Dspring.datasource.url=jdbc:mysql://peertutor.cp1u4sm6wyju.ap-southeast-1.rds.amazonaws.com:3306/peerTutor  -Dspring.datasource.password=my-secret-pw -Dspring.datasource.username="${MYSQLDB_USER}"  -Dserver.port=8086 -e
 #    -Dapp-config.jwtExpirationMs=${JWT_EXPIRY_DURATION} \
 
 #RUN ./mvnw install -DskipTests -e
