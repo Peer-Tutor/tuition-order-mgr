@@ -29,11 +29,7 @@ RUN echo DB_PORT = $DB_PORT
 
 # RUN ./mvnw install -DskipTests -e
 
-RUN ./mvnw install -Dspring.profiles.active=aws  \
-    -Dspring.datasource.url=jdbc:mysql://${DB_URL}:${DB_PORT}/${MYSQLDB_DATABASE}  \
-    -Dspring.datasource.password=${MYSQLDB_ROOT_PASSWORD} -Dspring.datasource.username=${MYSQLDB_USER}  \
-    -Dserver.port=${APPLICATION_PORT}\
-    -e
+RUN ./mvnw install -Dspring.profiles.active=aws  -Dspring.datasource.url=jdbc:mysql://$DB_URL:$DB_PORT/$MYSQLDB_DATABASE  -Dspring.datasource.password=$MYSQLDB_ROOT_PASSWORD -Dspring.datasource.username=$MYSQLDB_USER  -Dserver.port=$APPLICATION_PORT -e
 #    -Dapp-config.jwtExpirationMs=${JWT_SECRET} \
 #    -Dapp-config.jwtExpirationMs=${JWT_EXPIRY_DURATION} \
 
