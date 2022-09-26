@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping(path = "/tuition-order-mgr")
@@ -59,18 +61,44 @@ public class TuitionOrderController {
         return ResponseEntity.ok().body(res);
     }
 
-    @GetMapping("/tuitionOrder")
-    public ResponseEntity<List<TuitionOrderDTO>> getTuitionOrderByCriteria(@RequestBody @Valid TuitionOrderReq req, Pageable pageable) {
-        boolean result = authService.getAuthentication(req.name, req.sessionToken);
+    @GetMapping("/tuitionOrders")
+    public ResponseEntity<List<TuitionOrderDTO>> getTuitionOrderByCriteria(
+            @RequestParam(name = "name") String name,
+            @RequestParam(name = "sessionToken") String sessionToken,
+            @RequestParam(name = "studentId") Optional<Long> studentId,
+            @RequestParam(name = "tutorId") Optional<Long> tutorId,
+            @RequestParam(name = "startTime") Optional<Timestamp> startTime,
+            @RequestParam(name = "endTime") Optional<Timestamp> endTime,
+            @RequestParam(name = "status") Optional<Integer> status,
+            Pageable pageable
+    ) {
+        boolean result = authService.getAuthentication(name, sessionToken);
         if (!result) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
-        TuitionOrderCriteria criteria = new TuitionOrderCriteria(req);
+        TuitionOrderCriteria criteria = new TuitionOrderCriteria(studentId, tutorId, status);
         Page<TuitionOrderDTO> page = tuitionOrderService.getTuitionOrderByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
-        List<TuitionOrderDTO> test = page.getContent();
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
+    @GetMapping("/tuitionOrder")
+    public ResponseEntity<TuitionOrderDTO> getTuitionOrderByCriteria(
+            @RequestParam(name = "name") String name,
+            @RequestParam(name = "sessionToken") String sessionToken,
+            @RequestParam(name = "id") Long id
+    ) {
+        boolean result = authService.getAuthentication(name, sessionToken);
+        if (!result) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        TuitionOrderDTO tuitionOrder = tuitionOrderService.getTuitionOrderById(id);
+
+        if (tuitionOrder == null) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+        return ResponseEntity.ok().body(tuitionOrder);
+    }
 }
