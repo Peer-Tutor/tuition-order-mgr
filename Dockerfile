@@ -32,12 +32,13 @@ RUN echo DB_PORT = $DB_PORT
 # RUN ./mvnw install -DskipTests -e
 
 #RUN ["./mvnw install -Dspring.profiles.active=aws", ]
-RUN [ "sh", "-c", "./mvnw install -Dspring.profiles.active=aws", "-Dspring.datasource.url=jdbc:mysql://peertutor.cp1u4sm6wyju.ap-southeast-1.rds.amazonaws.com:3306/peerTutor", "-Dspring.datasource.password=my-secret-pw", "-Dspring.datasource.username=admin", "-Dserver.port=8086"]
-#RUN ./mvnw install -Dspring.profiles.active=aws \
-#    -Dspring.datasource.url=jdbc:mysql://peertutor.cp1u4sm6wyju.ap-southeast-1.rds.amazonaws.com:3306/peerTutor \
-#    -Dspring.datasource.password=my-secret-pw \
-#    -Dspring.datasource.username=admin  \
-#    -Dserver.port=8086 -e
+#RUN [ "sh", "-c", "./mvnw install -Dspring.profiles.active=aws", "-Dspring.datasource.url=jdbc:mysql://peertutor.cp1u4sm6wyju.ap-southeast-1.rds.amazonaws.com:3306/peerTutor", "-Dspring.datasource.password=my-secret-pw", "-Dspring.datasource.username=admin", "-Dserver.port=8086"]
+
+RUN ./mvnw install -Dspring.profiles.active=$SPRING_PROFILE \
+    -Dspring.datasource.url=jdbc:mysql://peertutor.cp1u4sm6wyju.ap-southeast-1.rds.amazonaws.com:3306/peerTutor \
+    -Dspring.datasource.password=my-secret-pw \
+    -Dspring.datasource.username=admin  \
+    -Dserver.port=8086 -e
 #    -Dapp-config.jwtExpirationMs=${JWT_EXPIRY_DURATION} \
 
 #RUN ./mvnw install -DskipTests -e
