@@ -37,8 +37,8 @@ RUN echo DB_PORT = $DB_PORT
 RUN ./mvnw install -Dspring.profiles.active=$SPRING_PROFILE \
     -Dspring.datasource.url=jdbc:mysql://peertutor.cp1u4sm6wyju.ap-southeast-1.rds.amazonaws.com:3306/peerTutor \
     -Dspring.datasource.password=$MYSQLDB_ROOT_PASSWORD \
-    -Dspring.datasource.username=admin  \
-    -Dserver.port=8086 -e
+    -Dspring.datasource.username=$MYSQLDB_USER  \
+    -Dserver.port=$APPLICATION_PORT -e
 #    -Dapp-config.jwtExpirationMs=${JWT_EXPIRY_DURATION} \
 
 #RUN ./mvnw install -DskipTests -e
