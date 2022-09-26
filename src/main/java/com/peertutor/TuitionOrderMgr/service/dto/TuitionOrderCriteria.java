@@ -6,6 +6,7 @@ import io.github.jhipster.service.filter.*;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Optional;
 
 
 public class TuitionOrderCriteria implements Serializable, Criteria {
@@ -21,6 +22,24 @@ public class TuitionOrderCriteria implements Serializable, Criteria {
     private IntegerFilter status;
 
     public TuitionOrderCriteria() {
+    }
+
+    public TuitionOrderCriteria(Optional<Long> studentId, Optional<Long> tutorId,
+                                Optional<Integer> status) {
+        if (studentId.isPresent()) {
+            this.studentId = new LongFilter();
+            this.studentId.setEquals(studentId.get());
+        }
+
+        if (tutorId.isPresent()) {
+            this.tutorId = new LongFilter();
+            this.tutorId.setEquals(tutorId.get());
+        }
+
+        if (status.isPresent()) {
+            this.status = new IntegerFilter();
+            this.status.setEquals(status.get());
+        }
     }
 
     public TuitionOrderCriteria(TuitionOrderCriteria other) {
