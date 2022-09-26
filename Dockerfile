@@ -35,7 +35,7 @@ RUN echo DB_PORT = $DB_PORT
 #RUN [ "sh", "-c", "./mvnw install -Dspring.profiles.active=aws", "-Dspring.datasource.url=jdbc:mysql://peertutor.cp1u4sm6wyju.ap-southeast-1.rds.amazonaws.com:3306/peerTutor", "-Dspring.datasource.password=my-secret-pw", "-Dspring.datasource.username=admin", "-Dserver.port=8086"]
 
 RUN ./mvnw install -Dspring.profiles.active=$SPRING_PROFILE \
-    -Dspring.datasource.url=jdbc:mysql://$DB_URL:$DB_PORT/$MYSQLDB_DATABASE \
+    -Dspring.datasource.url="jdbc:mysql://$DB_URL:$DB_PORT/$MYSQLDB_DATABASE" \
     -Dspring.datasource.password=$MYSQLDB_ROOT_PASSWORD \
     -Dspring.datasource.username=$MYSQLDB_USER  \
     -Dserver.port=$APPLICATION_PORT -e
