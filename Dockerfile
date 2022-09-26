@@ -12,13 +12,13 @@ ARG APPLICATION_PORT
 #ARG JWT_SECRET
 #ARG JWT_EXPIRY_DURATION
 
-ENV TEST=$TEST
-ENV DB_URL=$DB_URL
-ENV DB_PORT=$DB_PORT
-ENV MYSQLDB_DATABASE=$MYSQLDB_DATABASE
-ENV MYSQLDB_USER=$MYSQLDB_USER
-ENV MYSQLDB_ROOT_PASSWORD=$MYSQLDB_ROOT_PASSWORD
-ENV APPLICATION_PORT=$APPLICATION_PORT
+#ENV TEST=$TEST
+#ENV DB_URL=$DB_URL
+#ENV DB_PORT=$DB_PORT
+#ENV MYSQLDB_DATABASE=$MYSQLDB_DATABASE
+#ENV MYSQLDB_USER=$MYSQLDB_USER
+#ENV MYSQLDB_ROOT_PASSWORD=$MYSQLDB_ROOT_PASSWORD
+#ENV APPLICATION_PORT=$APPLICATION_PORT
 
 COPY mvnw .
 COPY .mvn .mvn
@@ -35,7 +35,7 @@ RUN echo DB_PORT = $DB_PORT
 #RUN [ "sh", "-c", "./mvnw install -Dspring.profiles.active=aws", "-Dspring.datasource.url=jdbc:mysql://peertutor.cp1u4sm6wyju.ap-southeast-1.rds.amazonaws.com:3306/peerTutor", "-Dspring.datasource.password=my-secret-pw", "-Dspring.datasource.username=admin", "-Dserver.port=8086"]
 
 RUN ./mvnw install -Dspring.profiles.active=$SPRING_PROFILE \
-    -Dspring.datasource.url=jdbc:mysql://"${DB_URL}":$DB_PORT/$MYSQLDB_DATABASE \
+    -Dspring.datasource.url=jdbc:mysql://$DB_URL:$DB_PORT/$MYSQLDB_DATABASE \
     -Dspring.datasource.password=$MYSQLDB_ROOT_PASSWORD \
     -Dspring.datasource.username=$MYSQLDB_USER  \
     -Dserver.port=$APPLICATION_PORT -e
