@@ -65,7 +65,7 @@ public class TuitionOrderDTO implements Serializable {
     }
 
     public void setEndTime(Timestamp endTime) {
-        this.startTime = endTime;
+        this.endTime = endTime;
     }
 
     public int getStatus() {
@@ -94,8 +94,13 @@ public class TuitionOrderDTO implements Serializable {
 
     @Override
     public String toString() {
-        return "TuitionOrder{" +
+        return "TuitionOrderDTO{" +
                 "id=" + id +
+                ", studentId=" + studentId +
+                ", tutorId=" + tutorId +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", status=" + status +
                 '}';
     }
 

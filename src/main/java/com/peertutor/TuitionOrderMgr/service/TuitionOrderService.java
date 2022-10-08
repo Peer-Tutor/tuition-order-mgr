@@ -2,24 +2,25 @@ package com.peertutor.TuitionOrderMgr.service;
 
 import com.peertutor.TuitionOrderMgr.model.TuitionOrder;
 import com.peertutor.TuitionOrderMgr.model.viewmodel.request.TuitionOrderReq;
+import com.peertutor.TuitionOrderMgr.model.viewmodel.response.StudentRes;
+import com.peertutor.TuitionOrderMgr.model.viewmodel.response.TutorRes;
 import com.peertutor.TuitionOrderMgr.repository.TuitionOrderRepository;
 import com.peertutor.TuitionOrderMgr.service.dto.TuitionOrderCriteria;
 import com.peertutor.TuitionOrderMgr.service.dto.TuitionOrderDTO;
+import com.peertutor.TuitionOrderMgr.service.dto.TuitionOrderDetailedDTO;
 import com.peertutor.TuitionOrderMgr.service.mapper.TuitionOrderMapper;
-import io.github.jhipster.web.util.PaginationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TuitionOrderService {
@@ -31,10 +32,66 @@ public class TuitionOrderService {
     private TuitionOrderRepository tuitionOrderRepository;
     @Autowired
     private TuitionOrderQueryService tuitionOrderQueryService;
+    @Autowired
+    private ExternalCallService externalCallService;
 
     public TuitionOrderService(TuitionOrderRepository tuitionOrderRepository, TuitionOrderMapper tuitionOrderMapper) {
         this.tuitionOrderRepository = tuitionOrderRepository;
         this.tuitionOrderMapper = tuitionOrderMapper;
+    }
+
+    public List<TuitionOrderDTO> getAllTuitionOrder () {
+        List<TuitionOrder> orders = tuitionOrderRepository.findAll();
+
+        return orders.stream().map(tuitionOrderMapper::toDto).collect(Collectors.toList());
+
+    }
+
+    public List<TuitionOrderDetailedDTO> getTuitionOrderDetails(String name, String sessionToken) {
+
+        logger.debug("Retrieving all tutor names and ids");
+        List<TutorRes> tutorList = externalCallService.getAllTutorName(name, sessionToken);
+
+        logger.debug("Retrieving all student names and ids");
+        List<StudentRes> studentList = externalCallService.getAllStudentName(name, sessionToken);
+
+        // convert to map for processing
+        Map<Long, String> studentNameIdMap = studentList.stream()
+                .collect(Collectors.toMap(
+                        StudentRes::getId, StudentRes::getDisplayName
+                ));
+
+
+        List<TuitionOrderDTO> tuitionOrders = getAllTuitionOrder();
+
+        // convert to map for processing
+        Map<Long, String> tutorNameIdMap = studentList.stream()
+                .collect(Collectors.toMap(
+                        StudentRes::getId, StudentRes::getDisplayName
+                ));
+
+        // manual join table.........
+        logger.debug("Combine multiple tables - student, tutor, tuition order");
+        List<TuitionOrderDetailedDTO> detailedOrders =  tuitionOrders.stream().map(order -> {
+            TuitionOrderDetailedDTO newOrder = new TuitionOrderDetailedDTO();
+
+            newOrder.setId(order.getId());
+
+            newOrder.setTutorId(order.getTutorId());
+            newOrder.setTutorName(tutorNameIdMap.get(order.getTutorId()));
+
+            newOrder.setStudentId(order.getStudentId());
+            newOrder.setStudentName(studentNameIdMap.get(order.getStudentId()));
+
+            newOrder.setStartTime(order.getStartTime());
+            newOrder.setEndTime(order.getEndTime());
+
+            newOrder.setStatus(order.getStatus());
+
+            return newOrder;
+        }).collect(Collectors.toList());
+        logger.debug("Successfully joined data");
+        return detailedOrders;
     }
 
     public Page<TuitionOrderDTO> getTuitionOrderByCriteria(TuitionOrderCriteria criteria, Pageable pageable) {

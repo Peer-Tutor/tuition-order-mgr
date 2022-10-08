@@ -1,12 +1,16 @@
 package com.peertutor.TuitionOrderMgr.controller;
 
 import com.peertutor.TuitionOrderMgr.model.viewmodel.request.TuitionOrderReq;
+import com.peertutor.TuitionOrderMgr.model.viewmodel.response.StudentRes;
 import com.peertutor.TuitionOrderMgr.model.viewmodel.response.TuitionOrderRes;
+import com.peertutor.TuitionOrderMgr.model.viewmodel.response.TutorRes;
 import com.peertutor.TuitionOrderMgr.repository.TuitionOrderRepository;
 import com.peertutor.TuitionOrderMgr.service.AuthService;
+import com.peertutor.TuitionOrderMgr.service.ExternalCallService;
 import com.peertutor.TuitionOrderMgr.service.TuitionOrderService;
 import com.peertutor.TuitionOrderMgr.service.dto.TuitionOrderCriteria;
 import com.peertutor.TuitionOrderMgr.service.dto.TuitionOrderDTO;
+import com.peertutor.TuitionOrderMgr.service.dto.TuitionOrderDetailedDTO;
 import com.peertutor.TuitionOrderMgr.util.AppConfig;
 import io.github.jhipster.web.util.PaginationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +26,10 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping(path = "/tuition-order-mgr")
@@ -36,9 +43,24 @@ public class TuitionOrderController {
     @Autowired
     private AuthService authService;
 
+    @Autowired
+    private ExternalCallService externalCallService;
+
     @GetMapping(path = "/health")
     public @ResponseBody String healthCheck() {
         return "Ok";
+    }
+
+    @GetMapping(path = "test")
+    public @ResponseBody String test(
+            @RequestParam(name = "name") String name,
+            @RequestParam(name = "sessionToken") String sessionToken) {
+        List<TutorRes> res = externalCallService.getAllTutorName(name, sessionToken);
+        List<StudentRes> res2 = externalCallService.getAllStudentName(name, sessionToken);
+        System.out.println("making api call");
+        System.out.println(res2);
+
+        return "";
     }
 
     @PostMapping(path = "/tuitionOrder")
@@ -59,6 +81,23 @@ public class TuitionOrderController {
         TuitionOrderRes res = new TuitionOrderRes(savedTutionOrder);
 
         return ResponseEntity.ok().body(res);
+    }
+
+    @GetMapping("/detailedTuitionOrders")
+    public ResponseEntity<List<TuitionOrderDetailedDTO>> getAllDetailedTuitionOrders(
+            @RequestParam(name = "name") String name,
+            @RequestParam(name = "sessionToken") String sessionToken
+    ) {
+        System.out.println("Authenticating...");
+        boolean result = authService.getAuthentication(name, sessionToken);
+        if (!result) {
+            System.out.println("Not authenticated");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        List<TuitionOrderDetailedDTO> tuitionOrders = tuitionOrderService.getTuitionOrderDetails(name, sessionToken);
+
+        System.out.println("finally, "+ tuitionOrders);
+        return ResponseEntity.ok().body(tuitionOrders);
     }
 
     @GetMapping("/tuitionOrders")
@@ -93,7 +132,9 @@ public class TuitionOrderController {
         if (!result) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
+        // get student name
 
+        // get tutor name
         TuitionOrderDTO tuitionOrder = tuitionOrderService.getTuitionOrderById(id);
 
         if (tuitionOrder == null) {
