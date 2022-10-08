@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TuitionOrderService {
@@ -62,6 +63,17 @@ public class TuitionOrderService {
         }
 
         TuitionOrderDTO result = tuitionOrderMapper.toDto(tuitionOrder);
+
+        return result;
+    }
+
+    public TuitionOrderDTO getTuitionOrderById(Long id) {
+        Optional<TuitionOrder> tuitionOrder = tuitionOrderRepository.findById(id);
+
+        if (!tuitionOrder.isPresent()) {
+            return null;
+        }
+        TuitionOrderDTO result = tuitionOrderMapper.toDto(tuitionOrder.get());
 
         return result;
     }
