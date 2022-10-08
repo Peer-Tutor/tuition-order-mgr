@@ -42,7 +42,7 @@ public class ExternalCallService {
                 .queryParam("sessionToken", sessionToken)
                 .queryParam("page", page)
                 .queryParam("size", size)
-                .encode()
+//                .encode()
                 .toUriString();
 
         System.out.println("urlTemplate" + urlTemplate);
@@ -74,7 +74,7 @@ public class ExternalCallService {
         String urlTemplate = UriComponentsBuilder.fromHttpUrl(endpoint)
                 .queryParam("name", name)
                 .queryParam("sessionToken", sessionToken)
-                .encode()
+//                .encode()
                 .toUriString();
 
         System.out.println("urlTemplate" + urlTemplate);
