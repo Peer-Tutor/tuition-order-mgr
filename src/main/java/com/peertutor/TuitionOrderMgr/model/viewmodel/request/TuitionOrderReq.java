@@ -1,9 +1,9 @@
 package com.peertutor.TuitionOrderMgr.model.viewmodel.request;
 
-import javax.persistence.Column;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.sql.Timestamp;
+import java.sql.Date;
+import java.util.List;
 
 public class TuitionOrderReq {
     @NotNull
@@ -14,13 +14,13 @@ public class TuitionOrderReq {
     @NotEmpty
     public String sessionToken;
 
+    public Long id;
+
     public Long studentId;
 
     public Long tutorId;
 
-    public Timestamp startTime;
-
-    public Timestamp endTime;
+    public List<Date> selectedDates;
 
     public Integer status;
 }

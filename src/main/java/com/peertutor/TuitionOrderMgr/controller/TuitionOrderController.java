@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,15 +47,15 @@ public class TuitionOrderController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
-        TuitionOrderDTO savedTutionOrder;
+        TuitionOrderDTO savedTuitionOrder;
 
-        savedTutionOrder = tuitionOrderService.createTuitionOrder(req);
+        savedTuitionOrder = tuitionOrderService.createTuitionOrder(req);
 
-        if (savedTutionOrder == null) {
+        if (savedTuitionOrder == null) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         }
 
-        TuitionOrderRes res = new TuitionOrderRes(savedTutionOrder);
+        TuitionOrderRes res = new TuitionOrderRes(savedTuitionOrder);
 
         return ResponseEntity.ok().body(res);
     }
@@ -67,8 +66,6 @@ public class TuitionOrderController {
             @RequestParam(name = "sessionToken") String sessionToken,
             @RequestParam(name = "studentId") Optional<Long> studentId,
             @RequestParam(name = "tutorId") Optional<Long> tutorId,
-            @RequestParam(name = "startTime") Optional<Timestamp> startTime,
-            @RequestParam(name = "endTime") Optional<Timestamp> endTime,
             @RequestParam(name = "status") Optional<Integer> status,
             Pageable pageable
     ) {

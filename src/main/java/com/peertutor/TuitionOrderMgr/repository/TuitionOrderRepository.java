@@ -5,10 +5,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 @Repository
 public interface TuitionOrderRepository extends JpaRepository<TuitionOrder, Long>, JpaSpecificationExecutor<TuitionOrder> {
-    TuitionOrder findByStudentIdAndTutorIdAndStartTimeAndEndTime(long studentId, long tutorId, Timestamp startTime, Timestamp endTime);
+    TuitionOrder findByStudentIdAndTutorId(long studentId, long tutorId);
+    List<TuitionOrder> findBySelectedDatesContainingAndStatus(String dates, int status);
 }
 

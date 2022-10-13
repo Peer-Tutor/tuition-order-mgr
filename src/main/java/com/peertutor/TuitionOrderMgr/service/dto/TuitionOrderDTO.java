@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.util.Objects;
 
 @Data
@@ -22,9 +21,7 @@ public class TuitionOrderDTO implements Serializable {
 
     private Long tutorId;
 
-    private Timestamp startTime;
-
-    private Timestamp endTime;
+    private String selectedDates;
 
     private int status;
 
@@ -50,22 +47,6 @@ public class TuitionOrderDTO implements Serializable {
 
     public void setTutorId(Long tutorId) {
         this.tutorId = tutorId;
-    }
-
-    public Timestamp getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Timestamp startTime) {
-        this.startTime = startTime;
-    }
-
-    public Timestamp getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(Timestamp endTime) {
-        this.startTime = endTime;
     }
 
     public int getStatus() {
@@ -102,5 +83,13 @@ public class TuitionOrderDTO implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hashCode(getId());
+    }
+
+    public String getSelectedDates() {
+        return selectedDates;
+    }
+
+    public void setSelectedDates(String selectedDates) {
+        this.selectedDates = selectedDates;
     }
 }
