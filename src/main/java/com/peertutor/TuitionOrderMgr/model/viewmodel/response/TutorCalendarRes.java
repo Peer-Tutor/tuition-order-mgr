@@ -13,4 +13,9 @@ public class TutorCalendarRes {
 
 	public TutorCalendarRes() {
 	}
+
+	@Override
+	public String toString() {
+		return "availableDate" + availableDate.toString();
+	}
 }

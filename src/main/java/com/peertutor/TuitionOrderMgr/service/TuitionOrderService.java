@@ -2,9 +2,12 @@ package com.peertutor.TuitionOrderMgr.service;
 
 import com.peertutor.TuitionOrderMgr.model.TuitionOrder;
 import com.peertutor.TuitionOrderMgr.model.viewmodel.request.TuitionOrderReq;
+import com.peertutor.TuitionOrderMgr.model.viewmodel.response.StudentRes;
+import com.peertutor.TuitionOrderMgr.model.viewmodel.response.TutorRes;
 import com.peertutor.TuitionOrderMgr.repository.TuitionOrderRepository;
 import com.peertutor.TuitionOrderMgr.service.dto.TuitionOrderCriteria;
 import com.peertutor.TuitionOrderMgr.service.dto.TuitionOrderDTO;
+import com.peertutor.TuitionOrderMgr.service.dto.TuitionOrderDetailedDTO;
 import com.peertutor.TuitionOrderMgr.service.mapper.TuitionOrderMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +17,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -31,10 +38,61 @@ public class TuitionOrderService {
     private TuitionOrderQueryService tuitionOrderQueryService;
     @Autowired
     private TutorCalendarService tutorCalendarService;
+    @Autowired
+    private ExternalCallService externalCallService;
 
     public TuitionOrderService(TuitionOrderRepository tuitionOrderRepository, TuitionOrderMapper tuitionOrderMapper) {
         this.tuitionOrderRepository = tuitionOrderRepository;
         this.tuitionOrderMapper = tuitionOrderMapper;
+    }
+
+    public List<TuitionOrderDTO> getAllTuitionOrder() {
+        List<TuitionOrder> orders = tuitionOrderRepository.findAll();
+
+        return orders.stream().map(tuitionOrderMapper::toDto).collect(Collectors.toList());
+
+    }
+
+    public List<TuitionOrderDetailedDTO> getTuitionOrderDetails(String name, String sessionToken) {
+
+        logger.debug("Retrieving all tutor names and ids");
+        List<TutorRes> tutorList = externalCallService.getAllTutorName(name, sessionToken);
+
+        logger.debug("Retrieving all student names and ids");
+        List<StudentRes> studentList = externalCallService.getAllStudentName(name, sessionToken);
+
+        // convert to map for processing
+        Map<Long, String> studentNameIdMap = studentList.stream()
+                .collect(Collectors.toMap(
+                        StudentRes::getId, StudentRes::getDisplayName));
+
+        List<TuitionOrderDTO> tuitionOrders = getAllTuitionOrder();
+
+        // convert to map for processing
+        Map<Long, String> tutorNameIdMap = tutorList.stream()
+                .collect(Collectors.toMap(
+                        TutorRes::getId, TutorRes::getDisplayName));
+
+        // manual join table.........
+        logger.debug("Combine multiple tables - student, tutor, tuition order");
+        List<TuitionOrderDetailedDTO> detailedOrders = tuitionOrders.stream().map(order -> {
+            TuitionOrderDetailedDTO newOrder = new TuitionOrderDetailedDTO();
+
+            newOrder.setId(order.getId());
+
+            newOrder.setTutorId(order.getTutorId());
+            newOrder.setTutorName(tutorNameIdMap.get(order.getTutorId()));
+
+            newOrder.setStudentId(order.getStudentId());
+            newOrder.setStudentName(studentNameIdMap.get(order.getStudentId()));
+            newOrder.setSelectedDates(order.getSelectedDates());
+
+            newOrder.setStatus(order.getStatus());
+
+            return newOrder;
+        }).collect(Collectors.toList());
+        logger.debug("Successfully joined data");
+        return detailedOrders;
     }
 
     public Page<TuitionOrderDTO> getTuitionOrderByCriteria(TuitionOrderCriteria criteria, Pageable pageable) {
@@ -43,9 +101,9 @@ public class TuitionOrderService {
     }
 
     public TuitionOrderDTO createTuitionOrder(TuitionOrderReq req) {
-        TuitionOrder tuitionOrder= new TuitionOrder();
+        TuitionOrder tuitionOrder = new TuitionOrder();
 
-        if(req.id != null) {
+        if (req.id != null) {
             tuitionOrderRepository.findById(req.id);
         }
 
@@ -54,12 +112,16 @@ public class TuitionOrderService {
         tuitionOrder.setTutorId(req.tutorId);
 
         Collections.sort(req.selectedDates);
+
         List<Date> availableDates = tutorCalendarService.getTutorCalendar(req.name, req.sessionToken, req.tutorId);
         String selectedDates = String.join(";", req.selectedDates.toString());
-
         if (req.status != null && req.status != 2) {
-            if(!availableDates.containsAll(req.selectedDates)) {
+            if (!availableDates.containsAll(req.selectedDates)) {
+                logger.info("Tutor is not available on selected dates");
                 return null;
+            } else {
+                logger.info("Tutor is available on selected dates");
+                
             }
         }
 
@@ -94,7 +156,9 @@ public class TuitionOrderService {
     }
 
     public void removeConflictTuitionOrder(List<Date> selectedDates) {
-        List<String> dates = selectedDates.stream().map(date -> {return date.toString();}).collect(Collectors.toList());
+        List<String> dates = selectedDates.stream().map(date -> {
+            return date.toString();
+        }).collect(Collectors.toList());
 
         dates.forEach(date -> {
             List<TuitionOrder> orders = tuitionOrderRepository.findBySelectedDatesContainingAndStatus(date, 0);

@@ -49,6 +49,7 @@ public class TuitionOrderDTO implements Serializable {
         this.tutorId = tutorId;
     }
 
+
     public int getStatus() {
         return status;
     }
@@ -75,10 +76,15 @@ public class TuitionOrderDTO implements Serializable {
 
     @Override
     public String toString() {
-        return "TuitionOrder{" +
+        return "TuitionOrderDTO{" +
                 "id=" + id +
+                ", studentId=" + studentId +
+                ", tutorId=" + tutorId +
+                ", selectedDates=" + selectedDates +
+                ", status=" + status +
                 '}';
     }
+
 
     @Override
     public int hashCode() {
