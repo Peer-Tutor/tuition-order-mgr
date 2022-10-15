@@ -4,7 +4,6 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
@@ -21,11 +20,8 @@ public class TuitionOrder {
     @Column(name = "tutor_id", nullable = false)
     private Long tutorId;
 
-    @Column(name = "start_time")
-    private Timestamp startTime;
-
-    @Column(name = "end_time")
-    private Timestamp endTime;
+    @Column(name = "selected_dates")
+    private String selectedDates;
 
     @Column(name = "status")
     private int status;
@@ -52,22 +48,6 @@ public class TuitionOrder {
 
     public void setTutorId(Long tutorId) {
         this.tutorId = tutorId;
-    }
-
-    public Timestamp getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Timestamp startTime) {
-        this.startTime = startTime;
-    }
-
-    public Timestamp getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(Timestamp endTime) {
-        this.endTime = endTime;
     }
 
     public int getStatus() {
@@ -99,5 +79,13 @@ public class TuitionOrder {
         return "TuitionOrder{" +
                 "id=" + id +
                 '}';
+    }
+
+    public String getSelectedDates() {
+        return selectedDates;
+    }
+
+    public void setSelectedDates(String selectedDates) {
+        this.selectedDates = selectedDates;
     }
 }

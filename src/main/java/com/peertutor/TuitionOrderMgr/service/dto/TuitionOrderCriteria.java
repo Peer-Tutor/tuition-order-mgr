@@ -2,7 +2,8 @@ package com.peertutor.TuitionOrderMgr.service.dto;
 
 import com.peertutor.TuitionOrderMgr.model.viewmodel.request.TuitionOrderReq;
 import io.github.jhipster.service.Criteria;
-import io.github.jhipster.service.filter.*;
+import io.github.jhipster.service.filter.IntegerFilter;
+import io.github.jhipster.service.filter.LongFilter;
 
 import java.io.Serializable;
 import java.util.Objects;
