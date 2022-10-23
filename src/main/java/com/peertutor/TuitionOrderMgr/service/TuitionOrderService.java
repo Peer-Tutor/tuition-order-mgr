@@ -104,7 +104,7 @@ public class TuitionOrderService {
         TuitionOrder tuitionOrder = new TuitionOrder();
 
         if (req.id != null) {
-            tuitionOrderRepository.findById(req.id);
+            tuitionOrder = tuitionOrderRepository.findById(req.id).orElse(new TuitionOrder());
         }
 
         tuitionOrder.setStatus(req.status);
