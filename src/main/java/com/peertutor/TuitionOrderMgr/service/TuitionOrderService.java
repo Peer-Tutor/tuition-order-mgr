@@ -104,7 +104,7 @@ public class TuitionOrderService {
         TuitionOrder tuitionOrder = new TuitionOrder();
 
         if (req.id != null) {
-            tuitionOrderRepository.findById(req.id);
+            tuitionOrder = tuitionOrderRepository.findById(req.id).orElse(new TuitionOrder());
         }
 
         tuitionOrder.setStatus(req.status);
@@ -134,7 +134,7 @@ public class TuitionOrderService {
             return null;
         } finally {
             if (req.id != null && req.status == 1) {
-                removeConflictTuitionOrder(req.selectedDates);
+                removeConflictTuitionOrder(req.selectedDates, req.tutorId);
                 tutorCalendarService.deleteTutorCalendar(req.name, req.sessionToken, req.tutorId, selectedDates);
             }
         }
@@ -155,13 +155,14 @@ public class TuitionOrderService {
         return result;
     }
 
-    public void removeConflictTuitionOrder(List<Date> selectedDates) {
+    public void removeConflictTuitionOrder(List<Date> selectedDates, Long tutorId) {
         List<String> dates = selectedDates.stream().map(date -> {
             return date.toString();
         }).collect(Collectors.toList());
 
         dates.forEach(date -> {
-            List<TuitionOrder> orders = tuitionOrderRepository.findBySelectedDatesContainingAndStatus(date, 0);
+            List<TuitionOrder> orders =
+                    tuitionOrderRepository.findBySelectedDatesContainingAndStatusAndTutorId(date, 0, tutorId);
             orders.forEach(order -> {
                 try {
                     order.setStatus(2);
